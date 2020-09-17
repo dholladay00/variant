@@ -1153,8 +1153,6 @@ namespace mpark {
         ~destructor() = delete;,
         inline void destroy() noexcept = delete;);
 
-#undef V_GPU_FUNCTION
-
 #undef MPARK_VARIANT_DESTRUCTOR
 
     template <typename Traits>
@@ -1268,7 +1266,7 @@ namespace mpark {
         copy_constructor(const copy_constructor &that) = default;);
 
     MPARK_VARIANT_COPY_CONSTRUCTOR(
-        Trait::Available,
+        Trait::Available,V_GPU_FUNCTION
         copy_constructor(const copy_constructor &that)
             : copy_constructor(valueless_t{}) {
           this->generic_construct(*this, that);
@@ -1702,8 +1700,8 @@ namespace mpark {
 
     ~variant() = default;
 
-    variant &operator=(const variant &) = default;
-    variant &operator=(variant &&) = default;
+    /*V_GPU_FUNCTION*/constexpr variant &operator=(const variant &) = default;
+    /*V_GPU_FUNCTION*/constexpr variant &operator=(variant &&) = default;
 
     template <typename Arg,
               lib::enable_if_t<!std::is_same<lib::decay_t<Arg>, variant>::value,
@@ -1792,7 +1790,7 @@ namespace mpark {
     friend struct detail::access::variant;
     friend struct detail::visitation::variant;
   };
-
+#undef V_GPU_FUNCTION
   template <std::size_t I, typename... Ts>
   inline constexpr bool holds_alternative(const variant<Ts...> &v) noexcept {
     return v.index() == I;
